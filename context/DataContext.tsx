@@ -106,9 +106,25 @@ export const DataProvider = ({ children }: PropsWithChildren) => {
   const [users, setUsers] = useState<User[]>(() => getFromStorage('users', initialUsers));
   const [jobs, setJobs] = useState<Job[]>(() => getFromStorage('jobs', initialJobs));
   const [transactions, setTransactions] = useState<Transaction[]>(() => getFromStorage('transactions', initialTransactions));
-  const [appSettings, setAppSettings] = useState<AppSettings>(() => getFromStorage('appSettings', initialSettings));
   const [jobSubmissions, setJobSubmissions] = useState<JobSubmission[]>(() => getFromStorage('jobSubmissions', initialJobSubmissions));
   
+  const [appSettings, setAppSettings] = useState<AppSettings>(() => {
+    const storedSettings = getFromStorage('appSettings', initialSettings);
+    // Ensure nested objects also have fallbacks to prevent crashes
+    return {
+      ...initialSettings,
+      ...storedSettings,
+      paymentNumbers: {
+        ...initialSettings.paymentNumbers,
+        ...(storedSettings.paymentNumbers || {}),
+      },
+      telegramLinks: {
+        ...initialSettings.telegramLinks,
+        ...(storedSettings.telegramLinks || {}),
+      },
+    };
+  });
+
   const [activeUserId, setActiveUserId] = useState<number | null>(() => getFromStorage('activeUserId', null));
 
   // Persist state to localStorage
